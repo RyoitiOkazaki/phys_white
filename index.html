@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合成速度マスター v2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f5f7ff;color:#222244;font-family:'Segoe UI',sans-serif;min-height:100vh;font-size:16px}
+
+.site-title{text-align:center;font-size:22px;font-weight:bold;color:#ffffff;
+  background:linear-gradient(135deg,#1a3a9a 0%,#2255cc 50%,#1a3a9a 100%);
+  padding:16px 24px;border-bottom:3px solid #1144bb;
+  text-shadow:0 1px 4px rgba(0,0,50,.4)}
+
+.tabs{display:flex;gap:0;border-bottom:2px solid #c4ccee;position:sticky;top:0;z-index:10;background:#eef1ff}
+.tab-btn{flex:1;padding:14px 10px;background:#eef1ff;border:none;color:#6677aa;
+  font-size:15px;font-weight:500;cursor:pointer;transition:.2s;
+  border-bottom:3px solid transparent;font-family:inherit}
+.tab-btn.active{background:#ffffff;color:#1a33bb;border-bottom:3px solid #3366ff;font-weight:bold;
+  box-shadow:0 2px 8px rgba(50,80,200,.1)}
+.tab-btn:hover:not(.active){background:#e4e8ff;color:#3344aa}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ===== TAB DESCRIPTION ===== */
+#tab-desc{background:#ffffff;border-bottom:2px solid #dde3ff;
+  padding:14px 26px;font-size:15px;line-height:1.8;
+  box-shadow:0 2px 8px rgba(50,80,200,.06)}
+#tab-desc .dtitle{color:#1a33bb;font-weight:bold;font-size:19px;margin-bottom:6px}
+#tab-desc .dbody{color:#333366;font-size:15px}
+#tab-desc .dgraph{color:#1a5577;font-size:14px;background:#eef6ff;
+  border-left:3px solid #3388cc;padding:8px 14px;margin-top:8px;border-radius:0 6px 6px 0}
+#tab-desc .dhow{color:#445588;font-size:14px;margin-top:8px}
+
+/* ===== SHARED BUTTONS ===== */
+.pm-btn{background:#e8ecff;border:1px solid #aabbee;color:#3344aa;
+  padding:5px 12px;border-radius:6px;cursor:pointer;font-size:14px;
+  transition:.15s;user-select:none;font-family:inherit}
+.pm-btn:hover{background:#d4dcff;color:#1133cc}
+.pm-val{font-weight:700;min-width:52px;text-align:center;font-size:14px}
+.pm-val.v1c{color:#1155dd}
+.pm-val.v2c{color:#cc3311}
+.pm-val.vaC{color:#1155dd}
+.pm-val.vbC{color:#cc6600}
+
+/* ===== MODE 1 ===== */
+#mode1{padding:18px}
+.m1-layout{display:flex;gap:18px;align-items:flex-start;max-width:860px;margin:0 auto}
+.ctrl-panel{background:#ffffff;border-radius:12px;padding:16px;width:260px;flex-shrink:0;
+  box-shadow:0 2px 16px rgba(50,80,200,.12);border:1px solid #dde3ff}
+.ctrl-panel h2{font-size:16px;margin-bottom:14px;color:#1a33bb}
+.vec-group{border-radius:10px;padding:12px;margin-bottom:12px}
+.vec-group.v1{border:1.5px solid #88aaee;background:#eef2ff}
+.vec-group.v2{border:1.5px solid #ee9977;background:#fff2ee}
+.vec-group h3{font-size:14px;margin-bottom:10px;font-weight:600}
+.vec-group.v1 h3{color:#1155cc}
+.vec-group.v2 h3{color:#cc4422}
+.btn-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.btn-row label{font-size:13px;color:#5566aa;width:46px;flex-shrink:0}
+.result-box{border:1.5px solid #55bb88;background:#f0fff8;border-radius:10px;padding:12px;margin-bottom:12px}
+.result-box h3{font-size:13px;color:#228855;margin-bottom:8px}
+.result-main{font-size:28px;font-weight:700;color:#117744;text-align:center;margin-bottom:4px}
+.result-sub{font-size:13px;color:#449966;text-align:center;margin-bottom:4px}
+.result-comp{font-size:12px;color:#336644;text-align:center}
+.tip-box{background:#eef6ff;border-left:3px solid #3388ff;padding:10px 14px;
+  font-size:13px;color:#2244aa;line-height:1.7;border-radius:4px}
+#c1{border-radius:12px;flex-shrink:0;display:block;
+  box-shadow:0 2px 16px rgba(50,80,200,.12);border:1px solid #dde3ff}
+
+/* ===== MODE 2 ===== */
+#mode2{padding:18px}
+.m2-layout{display:flex;gap:18px;align-items:flex-start;max-width:880px;margin:0 auto}
+.ctrl-panel2{background:#ffffff;border-radius:12px;padding:16px;width:280px;flex-shrink:0;
+  box-shadow:0 2px 16px rgba(50,80,200,.12);border:1px solid #dde3ff}
+.ctrl-panel2 h2{font-size:16px;margin-bottom:14px;color:#1a33bb}
+.vec-group.va{border:1.5px solid #88aaee;background:#eef2ff}
+.vec-group.vb{border:1.5px solid #ee9955;background:#fff4ee}
+.vec-group.va h3{color:#1155cc}
+.vec-group.vb h3{color:#cc6611}
+.result-box2{border:1.5px solid #55bb88;background:#f0fff8;border-radius:10px;padding:12px;margin-bottom:12px}
+.result-box2 h3{font-size:13px;color:#228855;margin-bottom:6px}
+.preset-btn{background:#eef2ff;border:1.5px solid #88aadd;color:#1a44aa;
+  padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;
+  transition:.15s;width:100%;text-align:left;margin-bottom:5px;font-family:inherit}
+.preset-btn:hover{background:#dce8ff;border-color:#4488cc}
+#c2{border-radius:12px;flex-shrink:0;display:block;
+  box-shadow:0 2px 16px rgba(50,80,200,.12);border:1px solid #dde3ff}
+
+/* ===== MODE 3 ===== */
+#mode3{padding:18px}
+.m3-wrap{max-width:900px;margin:0 auto}
+.m3-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.score-display{font-size:16px;color:#1a33bb;background:#eef1ff;
+  padding:10px 22px;border-radius:20px;border:1.5px solid #aabbee;font-weight:600}
+.lvl-btns{display:flex;gap:8px}
+.lv-btn{padding:10px 20px;border-radius:20px;border:2px solid #c0c8ee;
+  background:#f0f2ff;color:#3344aa;font-size:15px;cursor:pointer;
+  transition:.2s;font-weight:600;font-family:inherit}
+.lv-btn.active{border-color:#3366ff;color:#1133cc;background:#dde8ff;
+  box-shadow:0 2px 8px rgba(50,100,255,.2)}
+.lv-btn:hover:not(.active){background:#e4e8ff;border-color:#8899cc}
+#c3{display:block;border-radius:12px;
+  box-shadow:0 2px 16px rgba(50,80,200,.12);border:1px solid #dde3ff}
+.m3-controls{background:#ffffff;border-radius:12px;padding:14px;margin-top:12px;
+  display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;
+  box-shadow:0 2px 10px rgba(50,80,200,.08);border:1px solid #dde3ff}
+.angle-ctrl{display:flex;flex-direction:column;gap:8px}
+.angle-ctrl h4{font-size:14px;color:#1a33bb;margin-bottom:2px;font-weight:600}
+.angle-btn-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.angle-big-btn{background:#e8ecff;border:1px solid #aabbee;color:#3344aa;
+  padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;transition:.15s;font-family:inherit}
+.angle-big-btn:hover{background:#d4dcff;color:#1133cc}
+.angle-display{font-size:28px;font-weight:700;color:#cc7700;min-width:70px;text-align:center}
+.pass-btn{background:linear-gradient(135deg,#1144cc,#1a66ff);border:none;
+  color:#ffffff;padding:11px 28px;border-radius:8px;cursor:pointer;
+  font-size:16px;font-weight:bold;transition:.2s;font-family:inherit;
+  box-shadow:0 3px 10px rgba(20,80,220,.3)}
+.pass-btn:hover{background:linear-gradient(135deg,#0033bb,#1155ee);transform:translateY(-1px)}
+.reset-btn{background:#e8ecff;border:1px solid #9999cc;color:#3344aa;
+  padding:11px 22px;border-radius:8px;cursor:pointer;font-size:15px;transition:.2s;font-family:inherit}
+.reset-btn:hover{background:#d4dcff}
+.free-ctrl{display:flex;flex-direction:column;gap:8px}
+.free-ctrl h4{font-size:14px;color:#1a33bb;margin-bottom:2px;font-weight:600}
+.free-row{display:flex;align-items:center;gap:6px;font-size:13px;color:#4455aa}
+.free-row label{width:140px;flex-shrink:0}
+.free-val{font-weight:700;color:#1133bb;min-width:44px;text-align:center;font-size:14px}
+.theory-line{font-size:12px;color:#2266aa;margin-top:6px;line-height:1.6}
+.msg-area{min-height:38px;font-size:17px;color:#886600;text-align:center;margin-top:8px;font-weight:600}
+.desc-box{background:#f5f8ff;border-radius:8px;padding:12px 16px;font-size:14px;
+  color:#334466;line-height:1.7;margin-top:8px;border-left:3px solid #4466cc;
+  border:1px solid #dde3ff}
+
+/* ===== RESPONSIVE / MOBILE ===== */
+canvas{max-width:100%;height:auto}
+/* canvas touch drag */
+#c3{touch-action:none}
+
+@media(max-width:700px){
+  .site-title{font-size:17px;padding:12px 12px}
+  .tab-btn{font-size:13px;padding:11px 4px}
+  #tab-desc{padding:12px 14px}
+  #tab-desc .dtitle{font-size:16px}
+  #tab-desc .dbody,#tab-desc .dgraph,#tab-desc .dhow{font-size:13px}
+  #mode1,#mode2,#mode3{padding:10px}
+
+  /* ビジュアル優先：canvas → 設定パネル の順に */
+  .m1-layout{display:flex;flex-direction:column;gap:12px}
+  .m1-layout .ctrl-panel{order:2;width:100%;flex-shrink:unset}
+  #c1{order:1;width:100%!important;height:auto!important}
+  .m2-layout{display:flex;flex-direction:column;gap:12px}
+  .m2-layout .ctrl-panel2{order:2;width:100%;flex-shrink:unset}
+  #c2{order:1;width:100%!important;height:auto!important}
+
+  .m3-wrap{max-width:100%}
+  #c3{width:100%!important;height:auto!important}
+  .m3-top{flex-direction:column;align-items:flex-start}
+  .lvl-btns{flex-wrap:wrap}
+  .lv-btn{padding:8px 14px;font-size:13px}
+  .m3-controls{flex-direction:column;gap:12px;padding:12px}
+  .angle-btn-row{gap:4px;flex-wrap:wrap}
+  .angle-big-btn{padding:10px 14px;font-size:14px;min-width:70px}
+  .angle-display{font-size:28px;min-width:64px}
+  .pass-btn{padding:13px 24px;font-size:16px;flex:1}
+  .reset-btn{padding:13px 18px;font-size:14px}
+  .pm-btn{padding:8px 16px;font-size:15px}
+  .btn-row label{width:40px;font-size:12px}
+  .pm-val{font-size:13px;min-width:44px}
+}
+</style>
+</head>
+<body>
+
+<div class="site-title">合成速度を体験しよう！【物理学講座①速度】</div>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab1btn" onclick="switchTab(1)">🚢 モード1：速度の合成</button>
+  <button class="tab-btn" id="tab2btn" onclick="switchTab(2)">⚡ モード2：相対速度</button>
+  <button class="tab-btn" id="tab3btn" onclick="switchTab(3)">🏀 モード3：バスケパスゲーム</button>
+</div>
+
+<div id="tab-desc">
+  <div class="dtitle" id="desc-title"></div>
+  <div class="dbody"  id="desc-body"></div>
+  <div class="dgraph" id="desc-graph"></div>
+  <div class="dhow"   id="desc-how"></div>
+</div>
+
+<!-- MODE 1 -->
+<div id="mode1" class="tab-content active">
+  <div class="m1-layout">
+    <div class="ctrl-panel">
+      <h2>⚙️ 速度の設定</h2>
+
+      <div class="vec-group v1">
+        <h3 style="font-size:22px;margin-bottom:6px">🚢</h3>
+        <h3>v₁ &nbsp;船の速度</h3>
+        <div class="btn-row">
+          <label>大きさ</label>
+          <button class="pm-btn" onclick="adjM1Mag(1,-0.5)">－</button>
+          <span class="pm-val v1c" id="m1v1Mag">4.0 m/s</span>
+          <button class="pm-btn" onclick="adjM1Mag(1,+0.5)">＋</button>
+        </div>
+        <div class="btn-row">
+          <label>向き</label>
+          <button class="pm-btn" onclick="adjM1Ang(1,-5)">↺</button>
+          <span class="pm-val v1c" id="m1v1Ang">0°</span>
+          <button class="pm-btn" onclick="adjM1Ang(1,+5)">↻</button>
+        </div>
+      </div>
+
+      <div class="vec-group v2">
+        <h3 style="font-size:22px;margin-bottom:6px">🚶</h3>
+        <h3>v₂ &nbsp;あなたの速度（船の上で歩く速度）</h3>
+        <div class="btn-row">
+          <label>大きさ</label>
+          <button class="pm-btn" onclick="adjM1Mag(2,-0.5)">－</button>
+          <span class="pm-val v2c" id="m1v2Mag">3.0 m/s</span>
+          <button class="pm-btn" onclick="adjM1Mag(2,+0.5)">＋</button>
+        </div>
+        <div class="btn-row">
+          <label>向き</label>
+          <button class="pm-btn" onclick="adjM1Ang(2,-5)">↺</button>
+          <span class="pm-val v2c" id="m1v2Ang">90°</span>
+          <button class="pm-btn" onclick="adjM1Ang(2,+5)">↻</button>
+        </div>
+      </div>
+
+      <div class="result-box">
+        <h3>✨ 合成速度 v（地面から見たあなたの速度）</h3>
+        <div class="result-main" id="m1ResM">5.00 m/s</div>
+        <div class="result-sub" id="m1ResD">方向: 36.9°</div>
+        <div class="result-comp" id="m1ResC">x: 4.00　y: 3.00</div>
+      </div>
+
+    </div>
+
+    <canvas id="c1" width="580" height="500"></canvas>
+  </div>
+</div>
+
+<!-- MODE 2 -->
+<div id="mode2" class="tab-content">
+  <div class="m2-layout">
+    <div class="ctrl-panel2">
+      <h2>⚙️ 速度の設定</h2>
+
+      <div class="vec-group va" style="margin-bottom:10px;padding:12px;border-radius:8px">
+        <h3 style="font-size:22px;margin-bottom:4px">🚢</h3>
+        <h3>v_A &nbsp; 物体Aの速度</h3>
+        <div class="btn-row">
+          <label>大きさ</label>
+          <button class="pm-btn" onclick="adjM2Mag('A',-0.5)">－</button>
+          <span class="pm-val vaC" id="m2vAMag">4.0 m/s</span>
+          <button class="pm-btn" onclick="adjM2Mag('A',+0.5)">＋</button>
+        </div>
+        <div class="btn-row">
+          <label>向き</label>
+          <button class="pm-btn" onclick="adjM2Ang('A',-5)">↺</button>
+          <span class="pm-val vaC" id="m2vAAng">0°</span>
+          <button class="pm-btn" onclick="adjM2Ang('A',+5)">↻</button>
+        </div>
+      </div>
+
+      <div class="vec-group vb" style="margin-bottom:10px;padding:12px;border-radius:8px">
+        <h3 style="font-size:22px;margin-bottom:4px">🚤</h3>
+        <h3>v_B &nbsp; 物体Bの速度</h3>
+        <div class="btn-row">
+          <label>大きさ</label>
+          <button class="pm-btn" onclick="adjM2Mag('B',-0.5)">－</button>
+          <span class="pm-val vbC" id="m2vBMag">2.0 m/s</span>
+          <button class="pm-btn" onclick="adjM2Mag('B',+0.5)">＋</button>
+        </div>
+        <div class="btn-row">
+          <label>向き</label>
+          <button class="pm-btn" onclick="adjM2Ang('B',-5)">↺</button>
+          <span class="pm-val vbC" id="m2vBAng">0°</span>
+          <button class="pm-btn" onclick="adjM2Ang('B',+5)">↻</button>
+        </div>
+      </div>
+
+      <div class="result-box2">
+        <h3>📐 相対速度（BからみたAの速度）<br>
+          <span style="color:#559966;font-size:10px;font-weight:normal">v_rel = v_A − v_B</span>
+        </h3>
+        <div class="result-main" id="m2ResM">2.00 m/s</div>
+        <div class="result-sub" id="m2ResD">方向: 0.0°</div>
+        <div class="result-comp" id="m2ResC">x: 2.00　y: 0.00</div>
+      </div>
+
+      <button class="preset-btn" onclick="setM2Preset(4,0,2,0)">🚗 同方向で走る車 (A:4, B:2)</button>
+      <button class="preset-btn" onclick="setM2Preset(3,0,3,180)">🚗 対向してくる車 (A:3→, B:3←)</button>
+    </div>
+
+    <canvas id="c2" width="580" height="540"></canvas>
+  </div>
+</div>
+
+<!-- MODE 3 -->
+<div id="mode3" class="tab-content">
+  <div class="m3-wrap">
+    <div class="m3-top">
+      <div class="lvl-btns">
+        <button class="lv-btn active" id="lv1btn" onclick="setLevel(1)">LV1 🟢</button>
+        <button class="lv-btn" id="lv2btn" onclick="setLevel(2)">LV2 🟡</button>
+        <button class="lv-btn" id="lv3btn" onclick="setLevel(3)">LV3 🔴</button>
+        <button class="lv-btn" id="lvFbtn" onclick="setLevel('F')">FREE ⚙️</button>
+      </div>
+      <div class="score-display">⭐ スコア: <span id="scoreDisp">0</span></div>
+    </div>
+
+    <canvas id="c3" width="860" height="440"></canvas>
+
+    <div class="m3-controls">
+      <div class="angle-ctrl">
+        <h4>パスの角度 θ（上向きを正）</h4>
+        <div class="angle-btn-row">
+          <button class="angle-big-btn" onclick="adjAngle(-5)">◀◀ −5°</button>
+          <button class="angle-big-btn" onclick="adjAngle(-1)">◀ −1°</button>
+          <span class="angle-display" id="angDisp">60°</span>
+          <button class="angle-big-btn" onclick="adjAngle(+1)">+1° ▶</button>
+          <button class="angle-big-btn" onclick="adjAngle(+5)">+5° ▶▶</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:6px">
+          <button class="pass-btn" onclick="doPass()" id="passBtn">▶ パス！</button>
+          <button class="reset-btn" onclick="doReset()">↺ リセット</button>
+        </div>
+        <div class="msg-area" id="msgArea"></div>
+      </div>
+
+      <div class="free-ctrl" id="freeCtrl" style="display:none">
+        <h4>FREE モード設定</h4>
+        <div class="free-row">
+          <label>送り手の速さ vA:</label>
+          <button class="pm-btn" onclick="adjFree('vA',-0.2)">－</button>
+          <span class="free-val" id="fvADisp">2.0</span>
+          <button class="pm-btn" onclick="adjFree('vA',+0.2)">＋</button>
+          <span style="font-size:11px;color:#5577aa"> m/s</span>
+        </div>
+        <div class="free-row">
+          <label>受け手の速さ vB:</label>
+          <button class="pm-btn" onclick="adjFree('vB',-0.2)">－</button>
+          <span class="free-val" id="fvBDisp">2.0</span>
+          <button class="pm-btn" onclick="adjFree('vB',+0.2)">＋</button>
+          <span style="font-size:11px;color:#5577aa"> m/s</span>
+        </div>
+        <div class="free-row">
+          <label>受け手の方向 φ:</label>
+          <button class="pm-btn" onclick="adjFree('bDeg',-5)">◀</button>
+          <span class="free-val" id="fbDegDisp">0°</span>
+          <button class="pm-btn" onclick="adjFree('bDeg',+5)">▶</button>
+        </div>
+        <div class="theory-line" id="theoryLine">理論正解角度: −−°</div>
+      </div>
+    </div>
+
+    <div class="desc-box" id="descBox">
+      LV1: 船の上でパスを投げます。船と受け手は同じ速さで動いています。パスを正確に届けましょう！
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  UTILITIES
+// ============================================================
+function getCanvasPos(e, canvas) {
+  const r = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / r.width;
+  const scaleY = canvas.height / r.height;
+  if (e.touches) {
+    const t = e.touches[0] || e.changedTouches[0];
+    return { x: (t.clientX - r.left) * scaleX, y: (t.clientY - r.top) * scaleY };
+  }
+  return { x: (e.clientX - r.left) * scaleX, y: (e.clientY - r.top) * scaleY };
+}
+function deg2rad(d) { return d * Math.PI / 180; }
+function rad2deg(r) { return r * 180 / Math.PI; }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function fmt1(v) { return v.toFixed(1); }
+function fmt2(v) { return v.toFixed(2); }
+function drawArrow(ctx, x1, y1, x2, y2, headLen) {
+  const dx = x2-x1, dy = y2-y1;
+  const angle = Math.atan2(dy, dx);
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - headLen*Math.cos(angle-0.42), y2 - headLen*Math.sin(angle-0.42));
+  ctx.lineTo(x2 - headLen*Math.cos(angle+0.42), y2 - headLen*Math.sin(angle+0.42));
+  ctx.closePath();
+  ctx.fill();
+}
+
+// ============================================================
+//  MODE 1 STATE
+// ============================================================
+const m1 = {
+  v1: { m: 4.0, a: 0 },
+  v2: { m: 3.0, a: 90 },
+  drag: null,
+  raf: null, active: false,
+  ptProg: 0
+};
+const M1_S = 30, M1_OX = 290, M1_OY = 260;
+
+function adjM1Mag(which, d) {
+  if (which===1) m1.v1.m = clamp(+(m1.v1.m+d).toFixed(1), 0, 7);
+  else m1.v2.m = clamp(+(m1.v2.m+d).toFixed(1), 0, 7);
+  updateM1UI();
+}
+function adjM1Ang(which, d) {
+  if (which===1) { m1.v1.a = ((m1.v1.a+d)+360)%360; if(m1.v1.a>180) m1.v1.a-=360; }
+  else { m1.v2.a = ((m1.v2.a+d)+360)%360; if(m1.v2.a>180) m1.v2.a-=360; }
+  updateM1UI();
+}
+function updateM1UI() {
+  const v1x = m1.v1.m*Math.cos(deg2rad(m1.v1.a)), v1y = m1.v1.m*Math.sin(deg2rad(m1.v1.a));
+  const v2x = m1.v2.m*Math.cos(deg2rad(m1.v2.a)), v2y = m1.v2.m*Math.sin(deg2rad(m1.v2.a));
+  const rx = v1x+v2x, ry = v1y+v2y;
+  const rm = Math.sqrt(rx*rx+ry*ry);
+  const rd = rad2deg(Math.atan2(ry, rx));
+  document.getElementById('m1v1Mag').textContent = fmt1(m1.v1.m)+' m/s';
+  document.getElementById('m1v1Ang').textContent = Math.round(m1.v1.a)+'°';
+  document.getElementById('m1v2Mag').textContent = fmt1(m1.v2.m)+' m/s';
+  document.getElementById('m1v2Ang').textContent = Math.round(m1.v2.a)+'°';
+  document.getElementById('m1ResM').textContent = fmt2(rm)+' m/s';
+  document.getElementById('m1ResD').textContent = '方向: '+fmt1(rd)+'°';
+  document.getElementById('m1ResC').textContent = 'x: '+fmt2(rx)+'　y: '+fmt2(ry);
+}
+
+function drawM1() {
+  const canvas = document.getElementById('c1');
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const S=M1_S, OX=M1_OX, OY=M1_OY;
+
+  ctx.clearRect(0,0,W,H);
+  // ── Light background ──
+  ctx.fillStyle='#f4f7ff'; ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='#dde4ff'; ctx.lineWidth=1;
+  for(let x=OX%S;x<W;x+=S){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for(let y=OY%S;y<H;y+=S){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+
+  // Axes
+  ctx.strokeStyle='#9999cc'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(0,OY); ctx.lineTo(W,OY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(OX,0); ctx.lineTo(OX,H); ctx.stroke();
+
+  // Tick numbers
+  ctx.fillStyle='#8899bb'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  for(let i=-8;i<=8;i++){
+    if(i===0) continue;
+    const px=OX+i*S;
+    if(px>10&&px<W-10){ ctx.fillText(i,px,OY+14); }
+  }
+  ctx.textAlign='right';
+  for(let i=-6;i<=6;i++){
+    if(i===0) continue;
+    const py=OY-i*S;
+    if(py>10&&py<H-10){ ctx.fillText(i,OX-4,py+4); }
+  }
+  // Axis labels
+  ctx.fillStyle='#3366cc'; ctx.font='12px Segoe UI'; ctx.textAlign='left';
+  ctx.fillText('x (m/s)',W-48,OY-6);
+  ctx.textAlign='center'; ctx.fillText('y (m/s)',OX+28,12);
+
+  const v1x = m1.v1.m*Math.cos(deg2rad(m1.v1.a));
+  const v1y = m1.v1.m*Math.sin(deg2rad(m1.v1.a));
+  const v2x = m1.v2.m*Math.cos(deg2rad(m1.v2.a));
+  const v2y = m1.v2.m*Math.sin(deg2rad(m1.v2.a));
+  const rx = v1x+v2x, ry = v1y+v2y;
+
+  const v1cx = OX+v1x*S, v1cy = OY-v1y*S;
+  const v2cx = OX+v2x*S, v2cy = OY-v2y*S;
+  const rcx = OX+rx*S, rcy = OY-ry*S;
+
+  const HL = 12;
+
+  // Dashed v2 from v1 tip
+  ctx.setLineDash([5,5]);
+  ctx.strokeStyle='rgba(200,60,20,0.4)'; ctx.fillStyle='rgba(200,60,20,0.4)'; ctx.lineWidth=1.5;
+  drawArrow(ctx, v1cx, v1cy, rcx, rcy, HL);
+
+  // Dashed v1 from v2 tip
+  ctx.strokeStyle='rgba(20,80,220,0.4)'; ctx.fillStyle='rgba(20,80,220,0.4)'; ctx.lineWidth=1.5;
+  drawArrow(ctx, v2cx, v2cy, rcx, rcy, HL);
+  ctx.setLineDash([]);
+
+  // v1 (blue)
+  ctx.strokeStyle='#2266ee'; ctx.fillStyle='#2266ee'; ctx.lineWidth=3;
+  drawArrow(ctx, OX, OY, v1cx, v1cy, HL);
+  ctx.font='bold 12px Segoe UI'; ctx.textAlign='left';
+  ctx.fillText('v₁ (船)', v1cx+6, v1cy-4);
+
+  // v2 (red)
+  ctx.strokeStyle='#cc3311'; ctx.fillStyle='#cc3311'; ctx.lineWidth=3;
+  drawArrow(ctx, OX, OY, v2cx, v2cy, HL);
+  ctx.font='bold 12px Segoe UI';
+  ctx.fillText('v₂ (あなた)', v2cx+6, v2cy-4);
+
+  // Resultant (green)
+  ctx.strokeStyle='#119944'; ctx.fillStyle='#119944'; ctx.lineWidth=4;
+  drawArrow(ctx, OX, OY, rcx, rcy, HL+2);
+  ctx.font='bold 12px Segoe UI';
+  const rmag = Math.sqrt(rx*rx+ry*ry);
+  ctx.fillText('v = '+fmt2(rmag)+' m/s', rcx+8, rcy-6);
+
+  // Moving particle on resultant
+  const t = m1.ptProg;
+  const ptx = OX + rx*S*t, pty = OY - ry*S*t;
+  ctx.beginPath(); ctx.arc(ptx,pty,5,0,Math.PI*2);
+  ctx.fillStyle='#1144aa'; ctx.shadowColor='#3366cc'; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+
+  // Mini ship at v1 tip
+  drawMiniShip(ctx, v1cx, v1cy, m1.v1.a);
+  // Mini person at v2 tip
+  drawMiniPerson(ctx, v2cx, v2cy);
+
+  // Drag handles
+  [{ x:v1cx, y:v1cy, c:'#2266ee' }, { x:v2cx, y:v2cy, c:'#cc3311' }].forEach(h => {
+    ctx.beginPath(); ctx.arc(h.x, h.y, 9, 0, Math.PI*2);
+    ctx.strokeStyle=h.c; ctx.lineWidth=2.5;
+    ctx.shadowColor=h.c+'88'; ctx.shadowBlur=6; ctx.stroke(); ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+  });
+
+  // Hint
+  ctx.fillStyle='#8899bb'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('矢印の先をドラッグで動かせます', W/2, H-8);
+}
+
+function drawMiniShip(ctx, x, y, angleDeg) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-deg2rad(angleDeg));
+  ctx.fillStyle='#2255aa'; ctx.strokeStyle='#5588dd'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(-14,-5); ctx.lineTo(12,-5);
+  ctx.lineTo(16,0); ctx.lineTo(12,5); ctx.lineTo(-14,5); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#ffcc44';
+  ctx.fillRect(-4,-14,-4,10);
+  ctx.restore();
+}
+
+function drawMiniPerson(ctx, x, y) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.strokeStyle='#cc4422'; ctx.fillStyle='#ee5533'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(0,-14,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,-9); ctx.lineTo(0,2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-7,-2); ctx.lineTo(0,-6); ctx.lineTo(7,-2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,2); ctx.lineTo(-5,12); ctx.moveTo(0,2); ctx.lineTo(5,12); ctx.stroke();
+  ctx.restore();
+}
+
+function m1Loop() {
+  if(!m1.active) return;
+  m1.ptProg = (m1.ptProg + 0.008) % 1;
+  drawM1();
+  m1.raf = requestAnimationFrame(m1Loop);
+}
+function startM1() {
+  if(m1.active) return;
+  m1.active=true; m1.ptProg=0;
+  m1.raf = requestAnimationFrame(m1Loop);
+}
+function stopM1() {
+  m1.active=false;
+  if(m1.raf){ cancelAnimationFrame(m1.raf); m1.raf=null; }
+}
+
+const c1 = document.getElementById('c1');
+function m1HitTest(pos) {
+  const S=M1_S, OX=M1_OX, OY=M1_OY;
+  const v1x=OX+m1.v1.m*Math.cos(deg2rad(m1.v1.a))*S;
+  const v1y=OY-m1.v1.m*Math.sin(deg2rad(m1.v1.a))*S;
+  const v2x=OX+m1.v2.m*Math.cos(deg2rad(m1.v2.a))*S;
+  const v2y=OY-m1.v2.m*Math.sin(deg2rad(m1.v2.a))*S;
+  if(Math.hypot(pos.x-v1x, pos.y-v1y)<15) return 'v1';
+  if(Math.hypot(pos.x-v2x, pos.y-v2y)<15) return 'v2';
+  return null;
+}
+function m1DragUpdate(pos, which) {
+  const S=M1_S, OX=M1_OX, OY=M1_OY;
+  const vx=(pos.x-OX)/S, vy=-(pos.y-OY)/S;
+  const mag=clamp(Math.sqrt(vx*vx+vy*vy),0,7);
+  const ang=rad2deg(Math.atan2(vy,vx));
+  if(which==='v1'){ m1.v1.m=+mag.toFixed(2); m1.v1.a=+ang.toFixed(1); }
+  else { m1.v2.m=+mag.toFixed(2); m1.v2.a=+ang.toFixed(1); }
+  updateM1UI();
+}
+c1.addEventListener('mousedown', e=>{ const pos=getCanvasPos(e,c1); const h=m1HitTest(pos); if(h){ m1.drag=h; c1.style.cursor='grabbing'; e.preventDefault(); } });
+c1.addEventListener('mousemove', e=>{ const pos=getCanvasPos(e,c1); if(m1.drag){ m1DragUpdate(pos,m1.drag); } else { c1.style.cursor=m1HitTest(pos)?'grab':'default'; } });
+c1.addEventListener('mouseup', ()=>{ m1.drag=null; c1.style.cursor='default'; });
+c1.addEventListener('mouseleave', ()=>{ m1.drag=null; });
+c1.addEventListener('touchstart', e=>{ const pos=getCanvasPos(e,c1); const h=m1HitTest(pos); if(h){ m1.drag=h; e.preventDefault(); } }, {passive:false});
+c1.addEventListener('touchmove', e=>{ if(m1.drag){ m1DragUpdate(getCanvasPos(e,c1),m1.drag); e.preventDefault(); } }, {passive:false});
+c1.addEventListener('touchend', ()=>{ m1.drag=null; });
+
+// ============================================================
+//  MODE 2 STATE
+// ============================================================
+const m2 = {
+  vA: { m: 4.0, a: 0 },
+  vB: { m: 2.0, a: 0 },
+  drag: null,
+  raf: null, active: false,
+  ptProg: 0
+};
+const M2_S = 28, M2_OX = 290, M2_OY = 355;
+const M2_TOP_H = 160;
+
+function adjM2Mag(which, d) {
+  if(which==='A') m2.vA.m=clamp(+(m2.vA.m+d).toFixed(1),0,7);
+  else m2.vB.m=clamp(+(m2.vB.m+d).toFixed(1),0,7);
+  updateM2UI();
+}
+function adjM2Ang(which, d) {
+  if(which==='A'){ m2.vA.a=((m2.vA.a+d)+360)%360; if(m2.vA.a>180) m2.vA.a-=360; }
+  else { m2.vB.a=((m2.vB.a+d)+360)%360; if(m2.vB.a>180) m2.vB.a-=360; }
+  updateM2UI();
+}
+function setM2Preset(mA,aA,mB,aB) {
+  m2.vA={m:mA,a:aA}; m2.vB={m:mB,a:aB};
+  updateM2UI();
+}
+function updateM2UI() {
+  const ax=m2.vA.m*Math.cos(deg2rad(m2.vA.a)), ay=m2.vA.m*Math.sin(deg2rad(m2.vA.a));
+  const bx=m2.vB.m*Math.cos(deg2rad(m2.vB.a)), by=m2.vB.m*Math.sin(deg2rad(m2.vB.a));
+  const rx=ax-bx, ry=ay-by;
+  const rm=Math.sqrt(rx*rx+ry*ry);
+  const rd=rad2deg(Math.atan2(ry,rx));
+  document.getElementById('m2vAMag').textContent=fmt1(m2.vA.m)+' m/s';
+  document.getElementById('m2vAAng').textContent=Math.round(m2.vA.a)+'°';
+  document.getElementById('m2vBMag').textContent=fmt1(m2.vB.m)+' m/s';
+  document.getElementById('m2vBAng').textContent=Math.round(m2.vB.a)+'°';
+  document.getElementById('m2ResM').textContent=fmt2(rm)+' m/s';
+  document.getElementById('m2ResD').textContent='方向: '+fmt1(rd)+'°';
+  document.getElementById('m2ResC').textContent='x: '+fmt2(rx)+'　y: '+fmt2(ry);
+}
+
+function drawM2() {
+  const canvas = document.getElementById('c2');
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#f4f7ff'; ctx.fillRect(0,0,W,H);
+
+  const topH = M2_TOP_H;
+  // Top animation section bg
+  ctx.fillStyle='#edf2ff'; ctx.fillRect(0,0,W,topH);
+
+  const t = m2.ptProg;
+  const TRAVEL = 120;
+
+  const ax=m2.vA.m*Math.cos(deg2rad(m2.vA.a));
+  const ay=m2.vA.m*Math.sin(deg2rad(m2.vA.a));
+  const bx=m2.vB.m*Math.cos(deg2rad(m2.vB.a));
+  const by=m2.vB.m*Math.sin(deg2rad(m2.vB.a));
+  const rx=ax-bx, ry=ay-by;
+
+  // -- LEFT HALF: ground frame --
+  const LCX=140, LCY=80;
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,280,topH); ctx.clip();
+  ctx.fillStyle='#3355aa'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('🌍 地面から見ると', 140, 14);
+
+  const normAx=ax/(m2.vA.m||1), normAy=ay/(m2.vA.m||1);
+  const aAnimX=LCX+(t*TRAVEL-TRAVEL/2)*normAx;
+  const aAnimY=LCY-(t*TRAVEL-TRAVEL/2)*normAy;
+  for(let i=1;i<=5;i++){
+    const ti=t-(i*0.018); if(ti<0) continue;
+    const tx2=LCX+((ti*TRAVEL-TRAVEL/2)*normAx);
+    const ty2=LCY-((ti*TRAVEL-TRAVEL/2)*normAy);
+    ctx.beginPath(); ctx.arc(tx2,ty2,3*(1-i/6),0,Math.PI*2);
+    ctx.fillStyle=`rgba(30,100,220,${0.35-i*0.05})`; ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(aAnimX,aAnimY,8,0,Math.PI*2);
+  ctx.fillStyle='#2266ee'; ctx.shadowColor='#4488ff'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='#ffffff'; ctx.font='bold 11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('A', aAnimX, aAnimY+4);
+  ctx.fillStyle='#1144cc'; ctx.font='bold 12px Segoe UI';
+  ctx.fillText('A', aAnimX, aAnimY-16);
+
+  const normBx=bx/(m2.vB.m||1), normBy=by/(m2.vB.m||1);
+  const bAnimX=LCX+(t*TRAVEL*0.8-TRAVEL*0.4)*normBx+25;
+  const bAnimY=LCY-(t*TRAVEL*0.8-TRAVEL*0.4)*normBy+10;
+  for(let i=1;i<=4;i++){
+    const ti=t-(i*0.02); if(ti<0) continue;
+    const tx2=LCX+((ti*TRAVEL*0.8-TRAVEL*0.4)*normBx)+25;
+    const ty2=LCY-((ti*TRAVEL*0.8-TRAVEL*0.4)*normBy)+10;
+    ctx.beginPath(); ctx.arc(tx2,ty2,3*(1-i/5),0,Math.PI*2);
+    ctx.fillStyle=`rgba(200,90,10,${0.3-i*0.06})`; ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(bAnimX,bAnimY,8,0,Math.PI*2);
+  ctx.fillStyle='#cc6600'; ctx.shadowColor='#ee8800'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='#ffffff'; ctx.font='bold 11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('B', bAnimX, bAnimY+4);
+  ctx.fillStyle='#994400'; ctx.font='bold 12px Segoe UI';
+  ctx.fillText('B', bAnimX, bAnimY-16);
+  ctx.restore();
+
+  // -- RIGHT HALF: B's frame --
+  const RCX=435, RCY=80;
+  ctx.save(); ctx.beginPath(); ctx.rect(290,0,290,topH); ctx.clip();
+  ctx.fillStyle='#3355aa'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('👁 Bから見ると', 435, 14);
+
+  ctx.beginPath(); ctx.arc(RCX,RCY,8,0,Math.PI*2);
+  ctx.fillStyle='#cc6600'; ctx.shadowColor='#ee8800'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='#333355'; ctx.font='bold 11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('B（静止）', RCX, RCY+22);
+
+  const normRx=rx/(Math.sqrt(rx*rx+ry*ry)||1), normRy=ry/(Math.sqrt(rx*rx+ry*ry)||1);
+  const aRelX=RCX+(t*TRAVEL-TRAVEL/2)*normRx;
+  const aRelY=RCY-(t*TRAVEL-TRAVEL/2)*normRy;
+  for(let i=1;i<=5;i++){
+    const ti=t-(i*0.018); if(ti<0) continue;
+    const tx2=RCX+((ti*TRAVEL-TRAVEL/2)*normRx);
+    const ty2=RCY-((ti*TRAVEL-TRAVEL/2)*normRy);
+    ctx.beginPath(); ctx.arc(tx2,ty2,3*(1-i/6),0,Math.PI*2);
+    ctx.fillStyle=`rgba(30,100,220,${0.35-i*0.05})`; ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(aRelX,aRelY,8,0,Math.PI*2);
+  ctx.fillStyle='#2266ee'; ctx.shadowColor='#4488ff'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='#ffffff'; ctx.font='bold 11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('A', aRelX, aRelY+4);
+  ctx.fillStyle='#1144cc'; ctx.font='bold 12px Segoe UI';
+  ctx.fillText('A', aRelX, aRelY-16);
+  ctx.restore();
+
+  // Vertical divider
+  ctx.strokeStyle='#c0c8ee'; ctx.lineWidth=2; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(290,0); ctx.lineTo(290,topH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Section label bar
+  ctx.fillStyle='#e4e8ff'; ctx.fillRect(0,topH,W,15);
+  ctx.fillStyle='#5566aa'; ctx.font='11px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText('ベクトル図（相対速度）', W/2, topH+11);
+
+  // ---- BOTTOM VECTOR DIAGRAM ----
+  const S=M2_S, OX=M2_OX, OY=M2_OY;
+
+  // Grid
+  ctx.strokeStyle='#dde4ff'; ctx.lineWidth=1;
+  for(let x=OX%S;x<W;x+=S){ ctx.beginPath();ctx.moveTo(x,topH+15);ctx.lineTo(x,H);ctx.stroke(); }
+  for(let y=(OY%S+topH+15);y<H;y+=S){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+
+  // Axes
+  ctx.strokeStyle='#9999cc'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(0,OY); ctx.lineTo(W,OY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(OX,topH+15); ctx.lineTo(OX,H); ctx.stroke();
+
+  const vAcx=OX+ax*S, vAcy=OY-ay*S;
+  const vBcx=OX+bx*S, vBcy=OY-by*S;
+  const vrx=OX+rx*S, vry=OY-ry*S;
+  const HL=12;
+
+  // v_A (blue solid)
+  ctx.strokeStyle='#2266ee'; ctx.fillStyle='#2266ee'; ctx.lineWidth=3;
+  drawArrow(ctx, OX, OY, vAcx, vAcy, HL);
+  ctx.font='bold 11px Segoe UI';
+  ctx.fillText('v_A（Aの速度）', vAcx+7, vAcy-5);
+
+  // v_B (orange semi-transparent)
+  ctx.globalAlpha=0.65;
+  ctx.strokeStyle='#cc6600'; ctx.fillStyle='#cc6600'; ctx.lineWidth=2;
+  drawArrow(ctx, OX, OY, vBcx, vBcy, HL);
+  ctx.globalAlpha=1;
+  ctx.font='11px Segoe UI'; ctx.fillStyle='#cc6600';
+  ctx.fillText('v_B（Bの速度）', vBcx+7, vBcy-5);
+
+  // -v_B dashed from v_A tip
+  ctx.setLineDash([6,4]);
+  ctx.strokeStyle='#dd8800'; ctx.fillStyle='#dd8800'; ctx.lineWidth=2;
+  drawArrow(ctx, vAcx, vAcy, vrx, vry, HL);
+  ctx.setLineDash([]);
+  const midX=(vAcx+vrx)/2, midY=(vAcy+vry)/2;
+  ctx.font='10px Segoe UI'; ctx.fillStyle='#aa6600'; ctx.textAlign='left';
+  ctx.fillText('−v_B（逆向き）', midX+5, midY-3);
+
+  // v_rel (green thick)
+  ctx.strokeStyle='#119944'; ctx.fillStyle='#119944'; ctx.lineWidth=4;
+  drawArrow(ctx, OX, OY, vrx, vry, HL+2);
+  ctx.font='bold 12px Segoe UI'; ctx.fillStyle='#119944';
+  const rm2=Math.sqrt(rx*rx+ry*ry);
+  ctx.fillText('v_rel = '+fmt2(rm2)+' m/s', vrx+8, vry-7);
+
+  // Moving particle
+  const px2=OX+rx*S*m2.ptProg, py2=OY-ry*S*m2.ptProg;
+  ctx.beginPath(); ctx.arc(px2,py2,4,0,Math.PI*2);
+  ctx.fillStyle='#1144aa'; ctx.shadowColor='#3366cc'; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+
+  // Drag handles
+  [{ x:vAcx, y:vAcy, c:'#2266ee', label:'v_A' }, { x:vBcx, y:vBcy, c:'#cc6600', label:'v_B' }].forEach(h => {
+    ctx.beginPath(); ctx.arc(h.x, h.y, 9, 0, Math.PI*2);
+    ctx.strokeStyle=h.c; ctx.lineWidth=2.5;
+    ctx.shadowColor=h.c+'88'; ctx.shadowBlur=6; ctx.stroke(); ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+  });
+
+  // Formula box (bottom-right)
+  const fbox = { x:W-192, y:H-74, w:185, h:68 };
+  ctx.fillStyle='rgba(245,248,255,0.95)'; ctx.strokeStyle='#3388aa'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.roundRect(fbox.x, fbox.y, fbox.w, fbox.h, 6);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#228855'; ctx.font='bold 12px Segoe UI'; ctx.textAlign='left';
+  ctx.fillText('v_rel = v_A − v_B', fbox.x+8, fbox.y+20);
+  ctx.fillStyle='#446644'; ctx.font='11px Segoe UI';
+  ctx.fillText('     = Aの速度 − Bの速度', fbox.x+8, fbox.y+37);
+  ctx.fillText('     = BからみたAの速度', fbox.x+8, fbox.y+54);
+
+  ctx.textAlign='left';
+}
+
+function m2Loop() {
+  if(!m2.active) return;
+  m2.ptProg = (m2.ptProg + 0.008) % 1;
+  drawM2();
+  m2.raf = requestAnimationFrame(m2Loop);
+}
+function startM2() {
+  if(m2.active) return;
+  m2.active=true; m2.ptProg=0;
+  m2.raf = requestAnimationFrame(m2Loop);
+}
+function stopM2() {
+  m2.active=false;
+  if(m2.raf){ cancelAnimationFrame(m2.raf); m2.raf=null; }
+}
+
+const c2 = document.getElementById('c2');
+function m2HitTest(pos) {
+  const S=M2_S, OX=M2_OX, OY=M2_OY;
+  const ax=OX+m2.vA.m*Math.cos(deg2rad(m2.vA.a))*S;
+  const ay=OY-m2.vA.m*Math.sin(deg2rad(m2.vA.a))*S;
+  const bx=OX+m2.vB.m*Math.cos(deg2rad(m2.vB.a))*S;
+  const by=OY-m2.vB.m*Math.sin(deg2rad(m2.vB.a))*S;
+  if(Math.hypot(pos.x-ax, pos.y-ay)<15) return 'vA';
+  if(Math.hypot(pos.x-bx, pos.y-by)<15) return 'vB';
+  return null;
+}
+function m2DragUpdate(pos, which) {
+  const S=M2_S, OX=M2_OX, OY=M2_OY;
+  const vx=(pos.x-OX)/S, vy=-(pos.y-OY)/S;
+  const mag=clamp(Math.sqrt(vx*vx+vy*vy),0,7);
+  const ang=rad2deg(Math.atan2(vy,vx));
+  if(which==='vA'){ m2.vA.m=+mag.toFixed(2); m2.vA.a=+ang.toFixed(1); }
+  else { m2.vB.m=+mag.toFixed(2); m2.vB.a=+ang.toFixed(1); }
+  updateM2UI();
+}
+c2.addEventListener('mousedown', e=>{ const pos=getCanvasPos(e,c2); const h=m2HitTest(pos); if(h){ m2.drag=h; c2.style.cursor='grabbing'; e.preventDefault(); } });
+c2.addEventListener('mousemove', e=>{ const pos=getCanvasPos(e,c2); if(m2.drag){ m2DragUpdate(pos,m2.drag); } else { c2.style.cursor=m2HitTest(pos)?'grab':'default'; } });
+c2.addEventListener('mouseup', ()=>{ m2.drag=null; c2.style.cursor='default'; });
+c2.addEventListener('mouseleave', ()=>{ m2.drag=null; });
+c2.addEventListener('touchstart', e=>{ const pos=getCanvasPos(e,c2); const h=m2HitTest(pos); if(h){ m2.drag=h; e.preventDefault(); } }, {passive:false});
+c2.addEventListener('touchmove', e=>{ if(m2.drag){ m2DragUpdate(getCanvasPos(e,c2),m2.drag); e.preventDefault(); } }, {passive:false});
+c2.addEventListener('touchend', ()=>{ m2.drag=null; });
+
+// ============================================================
+//  MODE 3 STATE  (Basketball)
+// ============================================================
+const LEVELS = {
+  1: { vA:2.0, vB:2.0, bDeg:0, bSpd:4.5, initAngle:85,
+       desc:'LV1: 送り手と受け手は同じ速さ。真上に近い角度で投げてみよう！' },
+  2: { vA:2.0, vB:3.5, bDeg:0, bSpd:4.5, initAngle:70,
+       desc:'LV2: 受け手の方が速い。少し前（低め）に投げないと届かない！' },
+  3: { vA:3.0, vB:1.8, bDeg:0, bSpd:4.5, initAngle:105,
+       desc:'LV3: 受け手が遅め。少し後ろ（高め）に投げよう！' },
+  F: { vA:2.0, vB:2.0, bDeg:0, bSpd:4.5, initAngle:90,
+       desc:'FREEモード: 速さや方向を自由に設定して実験しよう！' }
+};
+
+let m3 = {
+  level: 1, angle: 50, score: 0,
+  state: 'idle', raf: null, failCount: 0, params: null,
+  p1: {x:0,y:0}, p2: {x:0,y:0},
+  ball: {x:0,y:0,vx:0,vy:0},
+  missX: null, missY: null, catchX: null, catchY: null,
+  resultMsg: '', trailPts: [],
+  freeFrozen: false, freeVA: 2.0, freeVB: 2.0, freeBDeg: 0,
+  dragAngle: false
+};
+
+const C3W=860, C3H=440;
+const P1_BASE_X=130, P1_Y=370;
+const P2_BASE_X=130, P2_Y=155;
+const GAP=215;
+
+function getM3Params() {
+  const lv = m3.level;
+  const base = LEVELS[lv];
+  if(lv==='F') return { vA:m3.freeVA, vB:m3.freeVB, bDeg:m3.freeBDeg, bSpd:base.bSpd, initAngle:base.initAngle };
+  return { ...base };
+}
+
+function setLevel(lv) {
+  m3.level=lv; m3.failCount=0;
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('active'));
+  const id = lv==='F'?'lvFbtn':`lv${lv}btn`;
+  document.getElementById(id).classList.add('active');
+  document.getElementById('freeCtrl').style.display = lv==='F'?'flex':'none';
+  document.getElementById('descBox').textContent=LEVELS[lv]?.desc||'';
+  doReset();
+}
+
+function adjAngle(d) {
+  m3.angle=clamp(m3.angle+d,5,175);
+  document.getElementById('angDisp').textContent=m3.angle+'°';
+}
+
+function adjFree(key, d) {
+  if(key==='vA'){ m3.freeVA=clamp(+(m3.freeVA+d).toFixed(1),0.5,4.0); document.getElementById('fvADisp').textContent=fmt1(m3.freeVA); }
+  else if(key==='vB'){ m3.freeVB=clamp(+(m3.freeVB+d).toFixed(1),0.5,4.0); document.getElementById('fvBDisp').textContent=fmt1(m3.freeVB); }
+  else if(key==='bDeg'){ m3.freeBDeg=clamp(m3.freeBDeg+d,-60,60); document.getElementById('fbDegDisp').textContent=m3.freeBDeg+'°'; }
+  updateTheoryLine();
+  doReset();
+}
+
+function updateTheoryLine() {
+  const p=getM3Params();
+  const cosArg=(p.vB*Math.cos(deg2rad(p.bDeg))-p.vA)/p.bSpd;
+  let th='−−';
+  if(Math.abs(cosArg)<=1) th=fmt1(rad2deg(Math.acos(cosArg)));
+  document.getElementById('theoryLine').textContent='理論正解角度: arccos((vB·cosφ − vA) / bSpd) ≈ '+th+'°';
+}
+
+function doReset() {
+  if(m3.raf){ cancelAnimationFrame(m3.raf); m3.raf=null; }
+  m3.state='idle';
+  m3.missX=null; m3.missY=null; m3.catchX=null; m3.catchY=null;
+  m3.resultMsg=''; m3.trailPts=[];
+  const p=getM3Params();
+  m3.angle = p.initAngle || 90;
+  document.getElementById('angDisp').textContent=m3.angle+'°';
+  m3.p1={x:P1_BASE_X,y:P1_Y};
+  m3.p2={x:P1_BASE_X,y:P2_Y};
+  m3.ball={x:P1_BASE_X,y:P1_Y,vx:0,vy:0};
+  document.getElementById('msgArea').textContent='';
+  document.getElementById('passBtn').disabled=false;
+  updateTheoryLine();
+  drawM3();
+}
+
+function doPass() {
+  if(m3.state!=='idle') return;
+  const p=getM3Params();
+  const angleRad=deg2rad(m3.angle);
+  const bvx=p.vA+p.bSpd*Math.cos(angleRad);
+  const bvy=-p.bSpd*Math.sin(angleRad);
+  m3.ball={x:m3.p1.x,y:m3.p1.y,vx:bvx,vy:bvy};
+  m3.state='fly'; m3.trailPts=[]; m3.missX=null; m3.missY=null;
+  document.getElementById('passBtn').disabled=true;
+  document.getElementById('msgArea').textContent='';
+  m3.raf=requestAnimationFrame(m3Step);
+}
+
+const DT=1/60, PPM=22;
+function m3Step() {
+  if(m3.state!=='fly'){ drawM3(); return; }
+  const p=getM3Params();
+  m3.p1.x+=p.vA*PPM*DT;
+  const bDegRad=deg2rad(p.bDeg);
+  m3.p2.x+=p.vB*Math.cos(bDegRad)*PPM*DT;
+  m3.p2.y+=-p.vB*Math.sin(bDegRad)*PPM*DT;
+  m3.ball.x+=m3.ball.vx*PPM*DT;
+  m3.ball.y+=m3.ball.vy*PPM*DT;
+  m3.trailPts.push({x:m3.ball.x,y:m3.ball.y});
+  if(m3.trailPts.length>80) m3.trailPts.shift();
+
+  const dist=Math.hypot(m3.ball.x-m3.p2.x,m3.ball.y-m3.p2.y);
+  if(dist<65) {
+    m3.state='success'; m3.catchX=m3.ball.x; m3.catchY=m3.ball.y;
+    m3.score++; document.getElementById('scoreDisp').textContent=m3.score;
+    m3.failCount=0;
+    const p2=getM3Params();
+    const cosArg=(p2.vB*Math.cos(deg2rad(p2.bDeg))-p2.vA)/p2.bSpd;
+    const correct=Math.abs(cosArg)<=1?fmt1(rad2deg(Math.acos(cosArg))):'−−';
+    m3.resultMsg='🎉 キャッチ成功！ (正解角度≈'+correct+'°)';
+    document.getElementById('msgArea').textContent=m3.resultMsg;
+    document.getElementById('passBtn').disabled=false;
+    drawM3(); return;
+  }
+
+  let missed=false, missReason='';
+  if(m3.ball.y<P2_Y-80){ missed=true; missReason='上に飛びすぎました'; }
+  if(m3.ball.x>C3W+50){ missed=true; missReason='右に飛びすぎました'; }
+  if(m3.p2.x>C3W+50||m3.p2.y>C3H+50){ missed=true; missReason='受け手が画面外に出ました'; }
+  if(m3.ball.x<m3.p2.x-110&&m3.ball.y<m3.p2.y+60){ missed=true; missReason='ボールが受け手の後ろに飛びました'; }
+  if(!missed&&m3.ball.y<=m3.p2.y+30&&m3.ball.y>=m3.p2.y-80){
+    const dx=m3.ball.x-m3.p2.x;
+    if(Math.abs(dx)>70){ missed=true; missReason=dx>0?'ボールが受け手より前に届きすぎました':'ボールが受け手の後ろに届きました'; }
+  }
+
+  if(missed) {
+    m3.missX=m3.ball.x; m3.missY=m3.ball.y;
+    const dxM=m3.ball.x-m3.p2.x;
+    const distM=Math.abs(dxM/20).toFixed(0);
+    m3.failCount++; m3.state='fail';
+    m3.resultMsg='❌ ミス！ '+missReason+' (約'+distM+'mずれ)';
+    document.getElementById('msgArea').textContent=m3.resultMsg;
+    if(m3.failCount>=3){
+      const p2=getM3Params();
+      const cosArg=(p2.vB*Math.cos(deg2rad(p2.bDeg))-p2.vA)/p2.bSpd;
+      const correct=Math.abs(cosArg)<=1?fmt1(rad2deg(Math.acos(cosArg))):'存在しない';
+      document.getElementById('descBox').textContent='ヒント：正解は約'+correct+'°です。'+(LEVELS[m3.level]?.desc||'');
+    }
+    document.getElementById('passBtn').disabled=false;
+    drawM3(); return;
+  }
+
+  drawM3();
+  m3.raf=requestAnimationFrame(m3Step);
+}
+
+function drawM3() {
+  const canvas=document.getElementById('c3');
+  const ctx=canvas.getContext('2d');
+  const W=C3W, H=C3H;
+
+  ctx.clearRect(0,0,W,H);
+
+  // ── バスケットボールコート（横向き） ──
+  const woodGrad=ctx.createLinearGradient(0,0,0,H);
+  woodGrad.addColorStop(0,'#da9140');woodGrad.addColorStop(0.5,'#c47828');woodGrad.addColorStop(1,'#da9140');
+  ctx.fillStyle=woodGrad; ctx.fillRect(0,0,W,H);
+  // 木目（横線）
+  ctx.save(); ctx.globalAlpha=0.10; ctx.strokeStyle='#6a2e00'; ctx.lineWidth=1;
+  for(let y=14;y<H;y+=14){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+  ctx.restore();
+  // コートライン（白）
+  ctx.strokeStyle='rgba(255,255,255,0.80)'; ctx.lineWidth=3;
+  ctx.strokeRect(18,10,W-36,H-20);
+  const midX=W/2;
+  ctx.beginPath();ctx.moveTo(midX,10);ctx.lineTo(midX,H-10);ctx.stroke();
+  ctx.beginPath();ctx.arc(midX,H/2,42,0,Math.PI*2);ctx.stroke();
+  ctx.lineWidth=2;
+  // 左キー
+  const kD=90,kHk=148;
+  ctx.strokeRect(18,H/2-kHk/2,kD,kHk);
+  ctx.beginPath();ctx.arc(18+kD,H/2,44,-Math.PI/2,Math.PI/2);ctx.stroke();
+  ctx.beginPath();ctx.arc(18,H/2,168,-1.12,1.12);ctx.stroke();
+  // 右キー
+  ctx.strokeRect(W-18-kD,H/2-kHk/2,kD,kHk);
+  ctx.beginPath();ctx.arc(W-18-kD,H/2,44,-Math.PI/2,Math.PI/2,true);ctx.stroke();
+  ctx.beginPath();ctx.arc(W-18,H/2,168,Math.PI-1.12,Math.PI+1.12);ctx.stroke();
+  // バスケット
+  ctx.strokeStyle='rgba(255,155,35,0.95)'; ctx.lineWidth=4;
+  ctx.beginPath();ctx.arc(24,H/2,16,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(W-24,H/2,16,0,Math.PI*2);ctx.stroke();
+
+  const p=getM3Params();
+
+  // Scale bar
+  ctx.fillStyle='#7788aa'; ctx.font='11px Segoe UI'; ctx.textAlign='left';
+  ctx.fillText('1m = '+PPM+'px', 10, H-8);
+
+  // Velocity arrows
+  if(p.vA>0.01) {
+    const arrLen=p.vA*22;
+    const ax1=m3.p1.x+15, ay1=m3.p1.y-10;
+    ctx.strokeStyle='#1155cc'; ctx.fillStyle='#1155cc'; ctx.lineWidth=2;
+    drawArrow(ctx,ax1,ay1,ax1+arrLen,ay1,9);
+    ctx.font='bold 10px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('vA='+fmt1(p.vA), ax1+arrLen/2, ay1-6);
+  }
+  if(p.vB>0.01) {
+    const arrLen2=p.vB*22;
+    const bDegRad=deg2rad(p.bDeg);
+    const ax2=m3.p2.x+15*Math.cos(bDegRad)+15;
+    const ay2=m3.p2.y-15*Math.sin(bDegRad)-10;
+    ctx.strokeStyle='#cc1111'; ctx.fillStyle='#cc1111'; ctx.lineWidth=2;
+    drawArrow(ctx,ax2,ay2,ax2+arrLen2*Math.cos(bDegRad),ay2-arrLen2*Math.sin(bDegRad),9);
+    ctx.font='bold 10px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('vB='+fmt1(p.vB), ax2+arrLen2*Math.cos(bDegRad)/2, ay2-arrLen2*Math.sin(bDegRad)-5);
+  }
+
+  // Ball trail
+  if(m3.trailPts.length>1) {
+    for(let i=1;i<m3.trailPts.length;i++){
+      const alpha=(i/m3.trailPts.length)*0.7;
+      ctx.beginPath();
+      ctx.moveTo(m3.trailPts[i-1].x,m3.trailPts[i-1].y);
+      ctx.lineTo(m3.trailPts[i].x,m3.trailPts[i].y);
+      ctx.strokeStyle=`rgba(255,255,255,${alpha*0.9})`;
+      ctx.lineWidth=2.5; ctx.stroke();
+    }
+  }
+
+  // Ball
+  if(m3.state==='fly'||m3.state==='idle') {
+    ctx.beginPath(); ctx.arc(m3.ball.x,m3.ball.y,10,0,Math.PI*2);
+    ctx.fillStyle='#ff8800'; ctx.shadowColor='#ffbb44'; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(m3.ball.x,m3.ball.y,10,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(m3.ball.x-10,m3.ball.y); ctx.lineTo(m3.ball.x+10,m3.ball.y); ctx.stroke();
+  }
+
+  // Idle angle arrow — 黒アウトライン＋黄色で背景に関わらず視認性確保
+  if(m3.state==='idle') {
+    const angleRad=deg2rad(m3.angle);
+    const arrowLen=96;
+    const endX=m3.p1.x+arrowLen*Math.cos(angleRad);
+    const endY=m3.p1.y-arrowLen*Math.sin(angleRad);
+    ctx.save();
+    ctx.setLineDash([7,4]);
+    // 黒アウトライン（太め）
+    ctx.strokeStyle='rgba(0,0,0,0.7)'; ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.lineWidth=6;
+    drawArrow(ctx,m3.p1.x,m3.p1.y,endX,endY,14);
+    // 黄色矢印（細め、上に重ねる）
+    ctx.strokeStyle='rgba(255,225,0,0.97)'; ctx.fillStyle='rgba(255,225,0,0.97)'; ctx.lineWidth=2.5;
+    drawArrow(ctx,m3.p1.x,m3.p1.y,endX,endY,12);
+    ctx.setLineDash([]);
+    // ドラッグハンドル
+    ctx.beginPath(); ctx.arc(endX,endY,15,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,225,0,0.22)'; ctx.fill();
+    ctx.strokeStyle='rgba(255,225,0,0.95)'; ctx.lineWidth=2.5; ctx.stroke();
+    // 角度テキスト（黒縁取り）
+    ctx.font='bold 13px Segoe UI'; ctx.textAlign='center';
+    ctx.strokeStyle='rgba(0,0,0,0.8)'; ctx.lineWidth=3; ctx.strokeText(m3.angle+'°',endX,endY+5);
+    ctx.fillStyle='#ffee00'; ctx.fillText(m3.angle+'°',endX,endY+5);
+    ctx.restore();
+  }
+
+  // Miss mark
+  if(m3.missX!==null) {
+    ctx.save();
+    ctx.strokeStyle='#cc1111'; ctx.lineWidth=3;
+    const sz=14;
+    ctx.beginPath();
+    ctx.moveTo(m3.missX-sz,m3.missY-sz); ctx.lineTo(m3.missX+sz,m3.missY+sz);
+    ctx.moveTo(m3.missX+sz,m3.missY-sz); ctx.lineTo(m3.missX-sz,m3.missY+sz);
+    ctx.stroke();
+    ctx.strokeStyle='rgba(200,50,50,0.5)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(m3.p2.x,m3.p2.y+2);
+    const armAngle=Math.atan2(m3.missY-m3.p2.y,m3.missX-m3.p2.x);
+    ctx.lineTo(m3.p2.x+40*Math.cos(armAngle),m3.p2.y+40*Math.sin(armAngle));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Catch sparkles
+  if(m3.catchX!==null&&m3.state==='success') {
+    ctx.save();
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4;
+      ctx.strokeStyle='rgba(0,160,60,0.8)'; ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(m3.catchX+10*Math.cos(a),m3.catchY+10*Math.sin(a));
+      ctx.lineTo(m3.catchX+26*Math.cos(a),m3.catchY+26*Math.sin(a));
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Players
+  drawStickFigure(ctx,m3.p1.x,m3.p1.y,'#1155cc','#0a3a99','P1（送り手）');
+  drawStickFigure(ctx,m3.p2.x,m3.p2.y,'#cc1111','#991111','P2（受け手）');
+
+  // Overlay messages
+  if(m3.state==='success') {
+    ctx.fillStyle='rgba(220,255,230,0.92)'; ctx.fillRect(250,160,360,80);
+    ctx.strokeStyle='#229944'; ctx.lineWidth=2; ctx.strokeRect(250,160,360,80);
+    ctx.fillStyle='#117733'; ctx.font='bold 22px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('🎉 キャッチ成功！', 430, 195);
+    ctx.fillStyle='#336644'; ctx.font='13px Segoe UI';
+    ctx.fillText(m3.resultMsg.replace('🎉 キャッチ成功！ ',''), 430, 220);
+  }
+  if(m3.state==='fail') {
+    ctx.fillStyle='rgba(255,220,220,0.92)'; ctx.fillRect(220,160,420,80);
+    ctx.strokeStyle='#cc2222'; ctx.lineWidth=2; ctx.strokeRect(220,160,420,80);
+    ctx.fillStyle='#aa1111'; ctx.font='bold 22px Segoe UI'; ctx.textAlign='center';
+    ctx.fillText('❌ ミス！', 430, 193);
+    ctx.fillStyle='#882222'; ctx.font='12px Segoe UI';
+    const lines=m3.resultMsg.replace('❌ ミス！ ','').split(' ');
+    ctx.fillText(lines.join(' '), 430, 218);
+  }
+
+  // Speed info box
+  ctx.fillStyle='rgba(240,245,255,0.94)'; ctx.strokeStyle='#6688cc'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.roundRect(W-185,8,178,58,6); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#3355aa'; ctx.font='11px Segoe UI'; ctx.textAlign='left';
+  ctx.fillText('送り手 vA: '+fmt1(p.vA)+' m/s  →', W-178, 26);
+  ctx.fillText('受け手 vB: '+fmt1(p.vB)+' m/s  方向:'+p.bDeg+'°', W-178, 42);
+  ctx.fillText('パス速さ（投げ手から見て）: '+fmt1(p.bSpd)+' m/s', W-178, 58);
+}
+
+function drawStickFigure(ctx,x,y,colorStroke,colorFill,label) {
+  ctx.save();
+  ctx.strokeStyle=colorStroke; ctx.fillStyle=colorFill; ctx.lineWidth=2.5;
+  ctx.lineCap='round';
+  ctx.shadowColor=colorStroke+'88'; ctx.shadowBlur=6;
+  ctx.beginPath(); ctx.arc(x,y-28,10,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.beginPath(); ctx.moveTo(x,y-18); ctx.lineTo(x,y+2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x-14,y-5); ctx.lineTo(x,y-12); ctx.lineTo(x+14,y-5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y+2); ctx.lineTo(x-11,y+22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y+2); ctx.lineTo(x+11,y+22); ctx.stroke();
+  ctx.fillStyle='#111133'; ctx.font='bold 13px Segoe UI'; ctx.textAlign='center';
+  ctx.fillText(label,x,y-44);
+  ctx.restore();
+}
+
+const c3=document.getElementById('c3');
+function m3AngleHit(pos, isTouch) {
+  if(m3.state!=='idle') return false;
+  const angleRad=deg2rad(m3.angle);
+  const endX=m3.p1.x+96*Math.cos(angleRad);
+  const endY=m3.p1.y-96*Math.sin(angleRad);
+  return Math.hypot(pos.x-endX,pos.y-endY) < (isTouch ? 40 : 22);
+}
+function m3AngleDrag(pos) {
+  const dy=m3.p1.y-pos.y, dx=pos.x-m3.p1.x;
+  const a=Math.round(rad2deg(Math.atan2(dy,dx)));
+  m3.angle=clamp(a,5,175);
+  document.getElementById('angDisp').textContent=m3.angle+'°';
+  drawM3();
+}
+c3.addEventListener('mousedown', e=>{ const pos=getCanvasPos(e,c3); if(m3AngleHit(pos,false)){ m3.dragAngle=true; c3.style.cursor='grabbing'; e.preventDefault(); } });
+c3.addEventListener('mousemove', e=>{ const pos=getCanvasPos(e,c3); if(m3.dragAngle){ m3AngleDrag(pos); } else { c3.style.cursor=m3AngleHit(pos,false)?'grab':'default'; } });
+c3.addEventListener('mouseup', ()=>{ m3.dragAngle=false; c3.style.cursor='default'; });
+c3.addEventListener('mouseleave', ()=>{ m3.dragAngle=false; });
+c3.addEventListener('touchstart', e=>{ const pos=getCanvasPos(e,c3); if(m3AngleHit(pos,true)){ m3.dragAngle=true; e.preventDefault(); } }, {passive:false});
+c3.addEventListener('touchmove', e=>{ if(m3.dragAngle){ m3AngleDrag(getCanvasPos(e,c3)); e.preventDefault(); } else if(m3.state==='idle'){ /* allow scroll */ } }, {passive:false});
+c3.addEventListener('touchend', ()=>{ m3.dragAngle=false; });
+
+// ============================================================
+//  TAB SWITCHING
+// ============================================================
+const TAB_DESCS_M = [null,
+  { title: '① 速度の合成：2つの速度を足し合わせるとどうなる？',
+    body:  '川を渡るフェリーのように、「自分の速度」と「流れの速度」が同時に働くとき、実際に進む速度（合成速度）はベクトルの足し算で求まります。船の上でどこへ歩いても、地面から見るとその合成になります。',
+    graph: '📊 ベクトル図の見方｜青い矢印（船の速度）と赤い矢印（あなたの速度）を端から端に並べると、緑の矢印（合成速度）になる。これが「平行四辺形の法則」。2つの速度が同じ向きなら合成速度が最大に、逆向きなら打ち消し合う！',
+    how:   '操作方法 ▶ 左のパネルで速度の大きさと向きを設定すると、リアルタイムでベクトルが更新されます。矢印の先をドラッグして動かすこともできます。' },
+  { title: '② 相対速度：「相手から見た自分の速度」はどう変わる？',
+    body:  'Bに乗って一緒に動くと、Bは止まって見える。その時Aがどう見えるかが「相対速度」です。同じ方向に走る2台の車では差の速さ、反対方向だと合計の速さに見えます。',
+    graph: '📊 見方のポイント｜v_rel = v_A − v_B（ベクトルで引き算）。同方向（Aが速い）→ Aがゆっくり追い越していく。同じ速さ → 相手は止まって見える。逆方向 → ものすごい速さで近づく！プリセットで体験しよう。',
+    how:   '操作方法 ▶ 青い物体Aと橙色の物体Bの速度を設定し、相対速度の変化を確認しましょう。プリセットボタンで「同方向」「対向」をすぐ試せます。' },
+  { title: '③ バスケパスゲーム：合成速度を使ってパスを成功させよう！',
+    body:  '走りながらパスを出すと、ボールは「投げた向きの速度」と「走る速度」が合成された方向に飛んでいきます。味方にパスを通すには、合成後の速度の向きを考えて角度を調整する必要があります。',
+    graph: '📊 コツ｜自分が右に走っている場合、ボールも右に流される。だから少し左向きに投げると合成速度がまっすぐになる。レベルが上がると走行速度が変わる → 毎回角度を計算し直す必要がある！',
+    how:   '操作方法 ▶ 角度ボタンでパスの向きを調整し、「パス！」を押して味方にボールを届けましょう。' }
+];
+
+function switchTab(n) {
+  stopM1(); stopM2();
+  if(m3.raf){ cancelAnimationFrame(m3.raf); m3.raf=null; }
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('mode'+n).classList.add('active');
+  document.getElementById('tab'+n+'btn').classList.add('active');
+  const d=TAB_DESCS_M[n];
+  document.getElementById('desc-title').textContent=d.title;
+  document.getElementById('desc-body').textContent=d.body;
+  document.getElementById('desc-graph').textContent=d.graph||'';
+  document.getElementById('desc-how').textContent=d.how;
+  if(n===1){ updateM1UI(); startM1(); }
+  else if(n===2){ updateM2UI(); startM2(); }
+  else if(n===3){ doReset(); }
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+(function(){
+  const d=TAB_DESCS_M[1];
+  document.getElementById('desc-title').textContent=d.title;
+  document.getElementById('desc-body').textContent=d.body;
+  document.getElementById('desc-graph').textContent=d.graph||'';
+  document.getElementById('desc-how').textContent=d.how;
+})();
+updateM1UI();
+startM1();
+updateM2UI();
+m3.params=getM3Params();
+document.getElementById('angDisp').textContent=m3.angle+'°';
+doReset();
+</script>
+</body>
+</html>
